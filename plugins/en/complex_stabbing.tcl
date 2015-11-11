@@ -11,21 +11,36 @@
 # in the modules directory.
 ###############################################################################
 
-bMotion_plugin_add_complex "stabbing" "%botnicks,?:? (please )?(stab) " 100 bMotion_plugin_complex_stabbing "en"
+bMotion_plugin_add_complex "stabbing" "%botnicks,?:? (please )?(stab) (.+)( with )?(.+)?" 150 bMotion_plugin_complex_stabbing "en"
 
 proc bMotion_plugin_complex_stabbing { nick host handle channel text } {
   global botnicks
-  if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+)" $text noparse noparse frogs pop details]} {
-    set who [string trim [string range $details 0 [string first " " $details]]]
-    if {$who == ""} { set who $details }
-    global stabs 
-    bMotionDoAction $channel $who "/stabs $who with a %VAR{types_of_knives} in the %VAR{body_parts}"
+	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+) with (.+) (.+)" $text noparse colon frogs pop somenick predicate item]} {
+    set who [string trim [string range $somenick 0 [string first " " $somenick]]]
+		set stab_text "$who with $predicate $item in the %VAR{body_parts}"
+    bMotionDoAction $channel $who "/stabs $stab_text"
 		bMotionGetHappy
 		bMotionGetHappy
-		if {[bMotion_mood_get happy] > 4} { 
+		if {[bMotion_mood_get happy] > 4} {
 		bMotionDoAction $channel $who "%VAR{reactions}"
 		}
-    return 1
+    return 0
+	} 
+	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+)" $text noparse colon please stab who]} {
+    #set who [string trim [string range $details 0 [string first " " $details]]]
+		set predicate ""
+		set item "%VAR{types_of_knives}"
+		
+		if {[regexp -nocase "^(a|e|i|o|u|hi)" $item ]} {
+			set predicate "an"
+		} else {
+			set predicate "a"
+		}
+		set stab_text "$who with $predicate $item in the %VAR{body_parts}"
+    bMotionDoAction $channel $stab_text "/stabs $stab_text"
+		bMotionGetHappy
+		bMotionDoAction $channel $who "Next time I'll get yer %VAR{body_parts} with my %VAR{types_of_knives}"
+    return 0
   }
 }
 
