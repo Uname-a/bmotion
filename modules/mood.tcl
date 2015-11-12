@@ -72,6 +72,14 @@ proc bMotion_mood_init { name initial min max target callback } {
 
 
 ## MOOD ROUTINES _________________________________________________________________________________
+proc bMotionGetStabby {} {
+	bMotion_mood_adjust stabby 1
+}
+
+proc bMotionGetUnstabby {} {
+	bMotion_mood_adjust stabby -1
+}
+
 proc bMotionGetHappy {} {
 	bMotion_mood_adjust happy 1
 }
@@ -102,7 +110,7 @@ proc checkmood {nick channel} {
 	return
 
   global mood
-  foreach r {happy horny lonely electricity stoned} {
+  foreach r {happy horny lonely electricity stoned stabby} {
     if {$r < -30} {
       set mood($r) -30
       bMotion_putloglev d * "bMotion: mood $r went OOB, resetting to -30"
@@ -130,7 +138,7 @@ proc driftmood {} {
 
   set driftSummary ""
   global mood mooddrifttimer moodtarget
-  foreach r {happy horny lonely electricity stoned} {
+  foreach r {happy horny lonely electricity stoned stabby} {
     set drift 0
     set driftString ""
     if {$mood($r) > $moodtarget($r)} {
@@ -369,5 +377,6 @@ bMotion_mood_init horny 0 -30 30 0 bMotion_mood_change_horny
 bMotion_mood_init lonely 0 -30 30 5 bMotion_mood_change_lonely
 bMotion_mood_init electricity 0 -30 30 2 bMotion_mood_change_electricity
 bMotion_mood_init stoned 0 -30 30 0 bMotion_mood_change_stoned
+bMotion_mood_init stabby 3 -30 30 0 bMotion_mood_change_stabby
 
 bMotion_putloglev d * "bMotion: mood module loaded"

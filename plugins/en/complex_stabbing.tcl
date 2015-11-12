@@ -13,6 +13,14 @@
 
 bMotion_plugin_add_complex "stabbing" "%botnicks,?:? (please )?(stab) (.+)( with )?(.+)?" 150 bMotion_plugin_complex_stabbing "en"
 
+proc checkdo_stabbing_spree { nick channel} {
+	if {[bMotion_mood_get stabby] > 3} {
+		bMotionDoAction $channel $nick "STABBING SPREE!"
+		bMotion_mood_adjust stabby -3
+		bMotionGetUnstabby
+	}
+}
+
 proc bMotion_plugin_complex_stabbing { nick host handle channel text } {
   global botnicks
 	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+) with (.+)" $text noparse colon frogs pop somenick item]} {
@@ -30,13 +38,14 @@ proc bMotion_plugin_complex_stabbing { nick host handle channel text } {
 		set stab_text "$somenick with $item in the %VAR{body_parts}"
     bMotionDoAction $channel $who "/stabs $stab_text"
 		bMotionGetHappy
-		bMotionGetHappy
+		bMotionGetStabby
 		if {[bMotion_mood_get happy] > 4} {
 		bMotionDoAction $channel $who "%VAR{reactions}"
 		}
+		checkdo_stabbing_spree $nick $channel 
     return 0
-	} 
-	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+)" $text noparse colon please stab who]} {
+	}
+	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+)" $text noparse colon please stab who]}		{
     #set who [string trim [string range $details 0 [string first " " $details]]]
 		set predicate ""
 		set item "%VAR{types_of_knives}"
@@ -49,13 +58,18 @@ proc bMotion_plugin_complex_stabbing { nick host handle channel text } {
 		set stab_text "$who with $predicate $item in the %VAR{body_parts}"
     bMotionDoAction $channel $stab_text "/stabs $stab_text"
 		bMotionGetHappy
-		bMotionDoAction $channel $who "Next time I'll get yer %VAR{body_parts} with my %VAR{types_of_knives}"
+		bMotionGetStabby
+		if {[rand 10] > 7} {
+			bMotionDoAction $channel $who "Next time I'll get yer %VAR{body_parts} with my %VAR{types_of_knives}"
+		}
+		checkdo_stabbing_spree $nick $channel
     return 0
   }
 }
 
 bMotion_abstract_register "types_of_knives" {
   "Bravo 3"
+  "Junglass"
   "BK7"
   "BM51"
   "Cryo"
