@@ -15,9 +15,19 @@ bMotion_plugin_add_complex "stabbing" "%botnicks,?:? (please )?(stab) (.+)( with
 
 proc bMotion_plugin_complex_stabbing { nick host handle channel text } {
   global botnicks
-	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+) with (.+) (.+)" $text noparse colon frogs pop somenick predicate item]} {
+	if {[regexp -nocase "^${botnicks},?:? (please )?(stab) (.+) with (.+)" $text noparse colon frogs pop somenick item]} {
     set who [string trim [string range $somenick 0 [string first " " $somenick]]]
-		set stab_text "$who with $predicate $item in the %VAR{body_parts}"
+		if {[ regexp -nocase "^${botnicks}" $somenick name]} {
+			if {[bMotion_mood_get happy] > 0} {
+				bMotionDoAction $channel $who "%VAR{reactions_happy}"
+				return 0
+			} else {
+				driftFriendship $nick -3
+				bMotionDoAction $channel $who "%VAR{reactions_sad}"
+			}
+		}
+
+		set stab_text "$somenick with $item in the %VAR{body_parts}"
     bMotionDoAction $channel $who "/stabs $stab_text"
 		bMotionGetHappy
 		bMotionGetHappy
@@ -86,3 +96,15 @@ bMotion_abstract_register "reactions" {
   "...Your fluids seem to be leaking"
 }
 
+bMotion_abstract_register "reactions_happy" {
+	"now why would I want to do that"
+	"what an insolent suggestion"
+	"that's ridiculous"
+	"how about *you* stab yourself!"
+}
+
+bMotion_abstract_register "reactions_sad" {
+	"Goodbye cruel world!"
+	"Death is near"
+	"Death is innevitable"
+}
