@@ -87,6 +87,8 @@ bMotion_abstract_register "types_of_knives" {
   "940-1"
   "XM-18"
   "ZT 0450"
+  "Zt 0562cf"
+  "Contago"
 }
 
 bMotion_abstract_register "body_parts" {
@@ -102,6 +104,11 @@ bMotion_abstract_register "body_parts" {
   "hand"
   "arm"
   "leg"
+  "spleen"
+  "jugular"
+  "groin"
+  "kidney"
+  "spine"
 }
 
 bMotion_abstract_register "reactions" {
